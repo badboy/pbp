@@ -7,11 +7,10 @@
 //! PGP formatted. If you don't want to use a heavyweight dependency like gpg,
 //! this library supports only the minimal necessary components of the PGP
 //! format to transmit your keys and signatures.
-#![feature(rust_2018_preview)]
 #![deny(missing_docs, missing_debug_implementations)]
 
-#[macro_use] extern crate failure;
-#[macro_use] extern crate bitflags;
+use failure::Fail;
+use bitflags::bitflags;
 
 #[cfg(feature = "dalek")]
 extern crate ed25519_dalek as dalek;
