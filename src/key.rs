@@ -97,7 +97,7 @@ impl PgpKey {
             ],
             sign,
         );
-        
+
         data.extend(signature_packet.as_bytes());
 
         PgpKey { data }
@@ -120,12 +120,12 @@ impl PgpKey {
         if !is_ed25519_valid(packet_data) {
             return Err(PgpError::UnsupportedPublicKeyPacket);
         }
-        
+
         // convert public key packet to the old style header,
         // two byte length. All methods on PgpKey assume the
         // public key is in that format (e.g. the fingerprint
         // method).
-        let data = if bytes[0] != 0x99 { 
+        let data = if bytes[0] != 0x99 {
             let mut packet = prepare_packet(6, |packet| packet.extend(packet_data));
             packet.extend(&bytes[end..]);
             packet
@@ -165,7 +165,7 @@ impl PgpKey {
         Sha512: Digest<OutputSize = U64>,
     {
         PgpKey::new::<Sha256, _>(keypair.public.as_bytes(), flags, user_id, unix_time, |data| {
-            keypair.sign::<Sha512>(data).to_bytes()
+            keypair.sign(data).to_bytes()
         })
     }
 

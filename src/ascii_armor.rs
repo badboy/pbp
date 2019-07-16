@@ -51,13 +51,13 @@ pub fn remove_ascii_armor(s: &str, expected_header: &str, expected_footer: &str)
     }
 
     Ok(data)
-} 
+}
 
 // Ascii armors data into the formatter
 pub fn ascii_armor(
     header: &'static str,
     footer: &'static str,
-    data: &[u8], 
+    data: &[u8],
     f: &mut fmt::Formatter
 ) -> fmt::Result
 {
@@ -67,12 +67,7 @@ pub fn ascii_armor(
     f.write_str("-----\n\n")?;
 
     // Base64'd data
-    let b64_cfg = base64::Config::new(
-        base64::CharacterSet::Standard,
-        true,
-        false,
-        base64::LineWrap::Wrap(76, base64::LineEnding::LF),
-    );
+    let b64_cfg = base64::Config::new(base64::CharacterSet::Standard, true);
     f.write_str(&base64::encode_config(data, b64_cfg))?;
     f.write_str("\n=")?;
 

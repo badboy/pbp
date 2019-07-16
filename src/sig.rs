@@ -37,7 +37,7 @@ pub enum SigType {
 }
 
 /// A subpacket to be hashed into the signed data.
-/// 
+///
 /// See RFC 4880 for more information.
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
 pub struct SubPacket<'a> {
@@ -98,16 +98,16 @@ impl PgpSig {
             });
 
             let hash = {
-                let mut hasher = Sha256::default();
+                let mut hasher = Sha256::new();
 
-                hasher.process(data);
+                hasher.input(data);
 
-                hasher.process(&packet[3..]);
+                hasher.input(&packet[3..]);
 
-                hasher.process(&[0x04, 0xff]);
-                hasher.process(&bigendian_u32((packet.len() - 3) as u32));
+                hasher.input(&[0x04, 0xff]);
+                hasher.input(&bigendian_u32((packet.len() - 3) as u32));
 
-                hasher.fixed_result()
+                hasher.result()
             };
 
             write_subpackets(packet, |unhashed_subpackets| {
@@ -205,17 +205,17 @@ impl PgpSig {
             F2: FnOnce(&[u8], Signature) -> bool,
     {
         let hash = {
-            let mut hasher = Sha256::default();
+            let mut hasher = Sha256::new();
 
             input(&mut hasher);
 
             let hashed_section = self.hashed_section();
-            hasher.process(hashed_section);
+            hasher.input(hashed_section);
 
-            hasher.process(&[0x04, 0xff]);
-            hasher.process(&bigendian_u32(hashed_section.len() as u32));
+            hasher.input(&[0x04, 0xff]);
+            hasher.input(&bigendian_u32(hashed_section.len() as u32));
 
-            hasher.fixed_result()
+            hasher.result()
         };
 
         verify(&hash[..], self.signature())
@@ -229,13 +229,13 @@ impl PgpSig {
         fingerprint: Fingerprint,
         sig_type: SigType,
         timestamp: u32,
-    ) -> PgpSig 
+    ) -> PgpSig
     where
         Sha256: Digest<OutputSize = U32>,
         Sha512: Digest<OutputSize = U64>,
     {
         PgpSig::new::<Sha256, _>(data, fingerprint, sig_type, timestamp, &[], |data| {
-            keypair.sign::<Sha512>(data).to_bytes()
+            keypair.sign(data).to_bytes()
         })
     }
 
@@ -255,7 +255,7 @@ impl PgpSig {
     {
         self.verify::<Sha256, _, _>(input, |data, signature| {
             let sig = dalek::Signature::from_bytes(&signature).unwrap();
-            key.verify::<Sha512>(data, &sig).is_ok()
+            key.verify(data, &sig).is_ok()
         })
     }
 }
