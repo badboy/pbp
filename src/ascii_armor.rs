@@ -68,7 +68,9 @@ pub fn ascii_armor(
 
     // Base64'd data
     let b64_cfg = base64::Config::new(base64::CharacterSet::Standard, true);
-    f.write_str(&base64::encode_config(data, b64_cfg))?;
+    let encoded = &base64::encode_config(data, b64_cfg);
+    let key_data = linjepakning::wrap_string(&encoded, 76, "\n").unwrap();
+    f.write_str(&key_data)?;
     f.write_str("\n=")?;
 
     // Checksum
